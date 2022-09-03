@@ -41,7 +41,7 @@ RegisterNetEvent("randol_moneywash:server:returncleancash")
 AddEventHandler("randol_moneywash:server:returncleancash", function(ServerDataWorth)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local finalworth = ServerDataWorth
+    local finalworth = (ServerDataWorth * 0.10)
     local fee = PercentageCut(Config.Percentage, finalworth)
     local floored = math.floor(finalworth - fee)
 
