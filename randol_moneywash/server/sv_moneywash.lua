@@ -26,13 +26,12 @@ AddEventHandler("randol_moneywash:server:checkforbills", function()
         end
     end
 
-    CreateThread(function()
+    
         if ServerDataWorth > 0 and amount > 0 then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "remove", amount)
             TriggerClientEvent('randol_moneywash:client:exchangebills', src, ServerDataWorth)
             TriggerClientEvent('QBCore:Notify', src, 'Please wait. Exchanging '..amount..' marked bills for clean cash.')
         end
-    end)
 
 end)
 
