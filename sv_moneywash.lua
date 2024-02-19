@@ -1,7 +1,7 @@
 local storedWorth = {}
 local Server = {
-    useFee = false, -- Use a percentage cut. (true = yes/ false = no). Percentage set below.
-    percentage = 10, -- Will deduct 10% of total worth.
+    UseFee = false, -- Use a percentage cut. (true = yes/ false = no). Percentage set below.
+    Percentage = 10, -- Will deduct 10% of total worth.
     locations = {
         {model = 'u_m_m_streetart_01', coords = vec4(721.41, -1203.5, 27.25, 180.74), dict = 'timetable@ron@ig_3_couch', anim = 'base'},
         {model = 'a_m_m_hasjew_01', coords = vec4(-489.54, -2228.88, 6.78, 233.56), scenario = 'WORLD_HUMAN_STAND_MOBILE', },
