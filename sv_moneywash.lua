@@ -15,11 +15,25 @@ local function percentageCut(percent, value)
     return false
 end
 
+local function isNearLocation(pos)
+    for i = 1, #Server.locations do
+        local coords = Server.locations[i].coords
+        if #(pos - coords.xyz) < 5.0 then
+            return true
+        end
+    end
+    return false
+end
+
 lib.callback.register('randol_moneywash:server:checkBills', function(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
+    local pos = GetEntityCoords(GetPlayerPed(src))
     local totalWorth = 0
     local amount = 0
+    local isNear = isNearLocation(pos)
+
+    if not isNear then return false end
 
     for slot, data in pairs(Player.PlayerData.items) do
         if data and data.name == 'markedbills' then
