@@ -31,15 +31,17 @@ local function spawnPeds()
             TaskStartScenarioInPlace(MW_PED, data.scenario, 0, true)
         end
 
-        exports['qb-target']:AddTargetEntity(MW_PED, {
+        exports['qb-target']:AddTargetEntity(MW_PED, { -- ox-target supports qb-target conversion for qb and esx
             options = {
                 {
                     icon = 'fa-solid fa-sack-dollar',
-                    label = 'Exchange Bills',
+                    label = 'Exchange',
                     action = function()
-                        lib.callback.await('randol_moneywash:server:checkBills', false)
+                        local success = lib.callback.await('randol_moneywash:server:checkBills', false)
+                        if not success then
+                            DoNotification("You don't have any dirty money.", "error")
+                        end
                     end,
-                    item = 'markedbills',
                 },
             },
             distance = 1.5,
@@ -51,31 +53,27 @@ end
 RegisterNetEvent('randol_moneywash:client:exchangeBills', function()
     if GetInvokingResource() then return end
     TaskStartScenarioInPlace(cache.ped, "WORLD_HUMAN_WINDOW_SHOP_BROWSE", 0, true)
-    QBCore.Functions.Progressbar("cleanbills", "Exchanging marked bills..", 10000, false, false, {
-        disableMovement = true,
-        disableCarMovement = true,
-        disableMouse = false,
-        disableCombat = true,
-    }, {}, {}, {}, function() -- Done
+    if lib.progressCircle({
+        duration = 10000,
+        position = 'bottom',
+        label = 'Exchanging marked bills..',
+        useWhileDead = true,
+        canCancel = false,
+        disable = { move = true, car = true, mouse = false, combat = true, },
+    }) then
         ClearPedTasksImmediately(cache.ped)
         lib.callback.await('randol_moneywash:server:returnCleanCash', false)
-    end)
+    end
 end)
 
 RegisterNetEvent('randol_moneywash:client:cacheConfig', function(data)
-    if GetInvokingResource() then return end
-    if LocalPlayer.state.isLoggedIn then
-        Config = data
-        spawnPeds()
-    end
+    if GetInvokingResource() or not hasPlyLoaded() then return end
+    Config = data
+    spawnPeds()
 end)
 
 AddEventHandler('onResourceStop', function(resourceName) 
 	if GetCurrentResourceName() == resourceName then
         deleteAllPeds()
 	end 
-end)
-
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    deleteAllPeds()
 end)

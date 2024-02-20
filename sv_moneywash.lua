@@ -27,27 +27,18 @@ end
 
 lib.callback.register('randol_moneywash:server:checkBills', function(source)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = GetPlayer(src)
     local pos = GetEntityCoords(GetPlayerPed(src))
-    local totalWorth = 0
-    local amount = 0
     local isNear = isNearLocation(pos)
 
     if not isNear then return false end
 
-    for slot, data in pairs(Player.PlayerData.items) do
-        if data and data.name == 'markedbills' then
-            totalWorth += (data.info.worth * data.amount)
-            amount += data.amount
-            Player.Functions.RemoveItem('markedbills', data.amount, slot)
-        end
-    end
+    local totalWorth = RemoveDirtyMoney(Player)
 
-    if totalWorth > 0 and amount > 0 then
+    if totalWorth > 0 then
         storedWorth[src] = totalWorth
-        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['markedbills'], "remove", amount)
         TriggerClientEvent('randol_moneywash:client:exchangeBills', src)
-        TriggerClientEvent('QBCore:Notify', src, ('Please wait. Exchanging %sx marked bills for clean cash.'):format(amount))
+        DoNotification(src, ('Please wait. Exchanging $%s dirty money for clean cash.'):format(totalWorth))
         return true
     end
 
@@ -56,7 +47,7 @@ end)
 
 lib.callback.register('randol_moneywash:server:returnCleanCash', function(source)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = GetPlayer(src)
     local totalWorth = storedWorth[src]
 
     if not totalWorth then return false end
@@ -64,11 +55,11 @@ lib.callback.register('randol_moneywash:server:returnCleanCash', function(source
     if Server.UseFee then
         local fee = percentageCut(Server.Percentage, totalWorth)
         local floored = math.floor(totalWorth - fee)
-        Player.Functions.AddMoney('cash', floored)
-        TriggerClientEvent('QBCore:Notify', src, ('You received $%s after the %s%s washing fee.'):format(floored, Server.Percentage, '%'), 'success')
+        AddCleanMoney(Player, 'cash', floored)
+        DoNotification(src, ('You received $%s after the %s%s washing fee.'):format(floored, Server.Percentage, '%'), 'success')
     else
-        Player.Functions.AddMoney('cash', totalWorth)
-        TriggerClientEvent('QBCore:Notify', src, ('You received $%s in return.'):format(totalWorth), 'success')
+        AddCleanMoney(Player, 'cash', totalWorth)
+        DoNotification(src, ('You received $%s in return.'):format(totalWorth), 'success')
     end
     storedWorth[src] = nil
     return true
@@ -81,9 +72,9 @@ AddEventHandler('onResourceStart', function(resourceName)
     end)
 end)
 
-RegisterNetEvent('QBCore:Server:OnPlayerLoaded', function()
+function PlayerHasLoaded(source)
     local src = source
     SetTimeout(2000, function()
         TriggerClientEvent('randol_moneywash:client:cacheConfig', src, Server)
     end)
-end)
+end
