@@ -2,7 +2,7 @@ local Config = {}
 local MW_PED = {}
 local storedPoints = {}
 
-local function deleteAllPeds()
+function deleteAllPeds()
     for point, _ in pairs(storedPoints) do
         if storedPoints[point] then
             storedPoints[point]:remove()
