@@ -67,15 +67,15 @@ end
 
 local function createPoints()
     for id, data in pairs(Config.locations) do
-		storedPoints[id] = lib.points.new({
-			coords = data.coords,
-			distance = 30,
-			index = id,
-            pedData = data,
-            onEnter = spawnPed,
-			onExit = yeetPed,
-		})
-	end
+	storedPoints[id] = lib.points.new({
+	coords = data.coords,
+	distance = 30,
+	index = id,
+	pedData = data,
+	onEnter = spawnPed,
+	onExit = yeetPed,
+	})
+    end
 end
 
 RegisterNetEvent('randol_moneywash:client:exchangeBills', function()
@@ -100,8 +100,8 @@ RegisterNetEvent('randol_moneywash:client:cacheConfig', function(data)
     createPoints()
 end)
 
-AddEventHandler('onResourceStop', function(resourceName) 
-	if GetCurrentResourceName() == resourceName then
-        deleteAllPeds()
-	end 
+AddEventHandler('onResourceStop', function(resourceName)
+    if GetCurrentResourceName() == resourceName then
+	deleteAllPeds()
+    end
 end)
