@@ -1,6 +1,6 @@
 if GetResourceState('qb-core') ~= 'started' then return end
 
-QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = exports['qb-core']:GetCoreObject()
 
 function GetPlayer(id)
     return QBCore.Functions.GetPlayer(id)
