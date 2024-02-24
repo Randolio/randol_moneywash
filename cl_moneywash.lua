@@ -102,6 +102,6 @@ end)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() == resourceName then
-    deleteAllPeds()
+        deleteAllPeds()
     end
 end)
