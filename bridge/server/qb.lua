@@ -29,9 +29,11 @@ function RemoveDirtyMoney(Player)
             local worth = ox_inventory and data.metadata.worth or data.info.worth
             local count = ox_inventory and data.count or data.amount
 
-            totalWorth += (worth * count)
-            amount += count
-            Player.Functions.RemoveItem('markedbills', count, slot)
+            if worth and count then
+                totalWorth += (worth * count)
+                amount += count
+                Player.Functions.RemoveItem('markedbills', count, slot)
+            end
         end
     end
 
@@ -39,9 +41,10 @@ function RemoveDirtyMoney(Player)
         if not ox_inventory then 
             TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['markedbills'], "remove", amount)
         end
+        return totalWorth
     end
 
-    return totalWorth
+    return 0, lib.print.error('No item metadata found for markedbills.')
 end
 
 function AddCleanMoney(Player, account, amount)
