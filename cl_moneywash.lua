@@ -68,12 +68,12 @@ end
 local function createPoints()
     for id, data in pairs(Config.locations) do
         storedPoints[id] = lib.points.new({
-        coords = data.coords,
-        distance = 30,
-        index = id,
-        pedData = data,
-        onEnter = spawnPed,
-        onExit = yeetPed,
+            coords = data.coords,
+            distance = 30,
+            index = id,
+            pedData = data,
+            onEnter = spawnPed,
+            onExit = yeetPed,
         })
     end
 end
