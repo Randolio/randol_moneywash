@@ -23,28 +23,37 @@ function RemoveDirtyMoney(Player)
 
     local ox_inventory = GetResourceState('ox_inventory') == 'started'
 
-    for slot, data in pairs(Player.PlayerData.items) do
-        if data and data.name == 'markedbills' then
+    if ox_inventory then
+        local count = exports.ox_inventory:GetItemCount(Player.PlayerData.source, 'black_money')
 
-            local worth = ox_inventory and data.metadata.worth or data.info.worth
-            local count = ox_inventory and data.count or data.amount
+        if count > 0 then
+            totalWorth = count
+            exports.ox_inventory:RemoveItem(Player.PlayerData.source, 'black_money', totalWorth)
+        end
 
-            if worth and count then
-                totalWorth += (worth * count)
-                amount += count
-                Player.Functions.RemoveItem('markedbills', count, slot)
+        return totalWorth
+    else
+        for slot, data in pairs(Player.PlayerData.items) do
+            if data and data.name == 'markedbills' then
+    
+                local worth = data.info.worth
+                local count = data.amount
+    
+                if worth and count then
+                    totalWorth += (worth * count)
+                    amount += count
+                    Player.Functions.RemoveItem('markedbills', count, slot)
+                end
             end
         end
-    end
-
-    if totalWorth > 0 and amount > 0 then
-        if not ox_inventory then 
+    
+        if totalWorth > 0 and amount > 0 then
             TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['markedbills'], "remove", amount)
+            return totalWorth
         end
-        return totalWorth
+    
+        return 0, lib.print.error('No item metadata found for markedbills.')
     end
-
-    return 0, lib.print.error('No item metadata found for markedbills.')
 end
 
 function AddCleanMoney(Player, account, amount)
