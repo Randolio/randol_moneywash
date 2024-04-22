@@ -23,7 +23,7 @@ local function spawnPed(point)
     if not DoesEntityExist(MW_PED[point.index]) then
         local data = point.pedData
         local model = joaat(data.model)
-        lib.requestModel(model, 5000)
+        lib.requestModel(model)
         
         MW_PED[point.index] = CreatePed(6, model, data.coords.x, data.coords.y, data.coords.z - 1.0, data.coords.w, false, true)
         SetEntityAsMissionEntity(MW_PED[point.index])
@@ -31,10 +31,12 @@ local function spawnPed(point)
         SetBlockingOfNonTemporaryEvents(MW_PED[point.index], true)
         SetEntityInvincible(MW_PED[point.index], true)
         FreezeEntityPosition(MW_PED[point.index], true)
+        SetModelAsNoLongerNeeded(model)
 
         if data.dict then
-            lib.requestAnimDict(data.dict, 5000)        
+            lib.requestAnimDict(data.dict)        
             TaskPlayAnim(MW_PED[point.index], data.dict, data.anim, 8.0, 1.0, -1, 01, 0, 0, 0, 0)
+            RemoveAnimDict(data.dict)
         elseif data.scenario then
             TaskStartScenarioInPlace(MW_PED[point.index], data.scenario, 0, true)
         end
