@@ -11,3 +11,5 @@ A script that cleans dirty money. Config options are in the server file for enab
 ## Requirements
 
 * [ox_lib](https://github.com/overextended/ox_lib/releases/)
+
+**You have permission to use this in your server and edit for your personal needs but are not allowed to redistribute.**
