@@ -1,6 +1,23 @@
 local Config = {}
 local MW_PED = {}
 local storedPoints = {}
+local oxtarget = GetResourceState('ox_target') == 'started'
+
+local function targetLocalEntity(entity, options, distance)
+    if oxtarget then
+        for _, option in ipairs(options) do
+            option.distance = distance
+            option.onSelect = option.action
+            option.action = nil
+        end
+        exports.ox_target:addLocalEntity(entity, options)
+    else
+        exports['qb-target']:AddTargetEntity(entity, {
+            options = options,
+            distance = distance
+        })
+    end
+end
 
 function deleteAllPeds()
     for point, _ in pairs(storedPoints) do
@@ -10,8 +27,12 @@ function deleteAllPeds()
     end
     for ped, _ in pairs(MW_PED) do
         if DoesEntityExist(MW_PED[ped]) then
+            if oxtarget then
+                exports.ox_target:removeLocalEntity(MW_PED[ped], 'Exchange')
+            else
+                exports['qb-target']:RemoveTargetEntity(MW_PED[ped], 'Exchange')
+            end
             DeleteEntity(MW_PED[ped])
-            exports['qb-target']:RemoveTargetEntity(MW_PED[ped], "Exchange")
         end
     end
     table.wipe(MW_PED)
@@ -41,28 +62,29 @@ local function spawnPed(point)
             TaskStartScenarioInPlace(MW_PED[point.index], data.scenario, 0, true)
         end
 
-        exports['qb-target']:AddTargetEntity(MW_PED[point.index], { -- ox-target supports qb-target conversion for qb and esx
-            options = {
-                {
-                    icon = 'fa-solid fa-sack-dollar',
-                    label = 'Exchange',
-                    action = function()
-                        local success = lib.callback.await('randol_moneywash:server:checkBills', false)
-                        if not success then
-                            DoNotification("You don't have any dirty money.", "error")
-                        end
-                    end,
-                },
+        targetLocalEntity(MW_PED[point.index], {
+            {
+                icon = 'fa-solid fa-sack-dollar',
+                label = 'Exchange',
+                action = function()
+                    local success = lib.callback.await('randol_moneywash:server:checkBills', false)
+                    if not success then
+                        DoNotification('You dont have any dirty money.', 'error')
+                    end
+                end,
             },
-            distance = 1.5,
-        })
+        }, 1.5)
     end
 end
 
 local function yeetPed(point)
     if DoesEntityExist(MW_PED[point.index]) then
+        if oxtarget then
+            exports.ox_target:removeLocalEntity(MW_PED[point.index], 'Exchange')
+        else
+            exports['qb-target']:RemoveTargetEntity(MW_PED[point.index], 'Exchange')
+        end
         DeleteEntity(MW_PED[point.index])
-        exports['qb-target']:RemoveTargetEntity(MW_PED[point.index], "Exchange")
         MW_PED[point.index] = nil
     end
 end
@@ -82,7 +104,7 @@ end
 
 RegisterNetEvent('randol_moneywash:client:exchangeBills', function()
     if GetInvokingResource() then return end
-    TaskStartScenarioInPlace(cache.ped, "WORLD_HUMAN_WINDOW_SHOP_BROWSE", 0, true)
+    TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_WINDOW_SHOP_BROWSE', 0, true)
     if lib.progressCircle({
         duration = 10000,
         position = 'bottom',
