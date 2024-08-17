@@ -1,10 +1,9 @@
 local Config = {}
 local MW_PED = {}
 local storedPoints = {}
-local oxtarget = GetResourceState('ox_target') == 'started'
 
 local function targetLocalEntity(entity, options, distance)
-    if oxtarget then
+    if GetResourceState('ox_target') == 'started' then
         for _, option in ipairs(options) do
             option.distance = distance
             option.onSelect = option.action
@@ -27,7 +26,7 @@ function deleteAllPeds()
     end
     for ped, _ in pairs(MW_PED) do
         if DoesEntityExist(MW_PED[ped]) then
-            if oxtarget then
+            if GetResourceState('ox_target') == 'started' then
                 exports.ox_target:removeLocalEntity(MW_PED[ped], 'Exchange')
             else
                 exports['qb-target']:RemoveTargetEntity(MW_PED[ped], 'Exchange')
@@ -79,7 +78,7 @@ end
 
 local function yeetPed(point)
     if DoesEntityExist(MW_PED[point.index]) then
-        if oxtarget then
+        if GetResourceState('ox_target') == 'started' then
             exports.ox_target:removeLocalEntity(MW_PED[point.index], 'Exchange')
         else
             exports['qb-target']:RemoveTargetEntity(MW_PED[point.index], 'Exchange')
